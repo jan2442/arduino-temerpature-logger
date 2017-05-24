@@ -1,0 +1,122 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <!-- Page Content -->
+        <div class="container-fluid">
+            <div class="row">
+                <!-- /.col-lg-12 -->
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-md-6">
+                    <div class="panel panel-yellow">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-clock-o fa-4x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge">{{ createdAt }}</div>
+                                    <div>Last measurement</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="panel panel-green">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-thermometer fa-4x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge">{{ temperature }}°C</div>
+                                    <div>Air temperature</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-cloud fa-4x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge">{{ humidity }}%</div>
+                                    <div>Air humidity</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+
+                    <div class="panel panel-red">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-heartbeat fa-4x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge">{{ co2 }}</div>
+                                    <div>Air quality</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-lg-12">
+                <div id="demodiv" style="height: 400px; "></div>
+            </div>
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+    <script>
+        $('.datetime').datetimepicker({
+            format: 'yyyy-mm-dd',
+            minView: 3
+        });
+
+        function loadData() {
+            var from = $('#from').val();
+            var to = $('#to').val();
+
+            var url = "/export/";
+            if (from) {
+                url += from;
+            }
+
+            if (to) {
+                url += "/" + to;
+            }
+            $.getJSON(url, function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    var dt = data[i][0].split('-').join('/');
+                    data[i][0] = new Date(dt);
+                }
+
+                gg = new Dygraph(document.getElementById("demodiv"), (data), {
+                    labels: ['Date', 'Temperature', 'Humidity', 'Co2'],
+                    title: "Air temperature and humidity for last 7 days",
+                    fillGraph: true,
+                    showRoller: true,
+                    colors: ['#339933', '#2e517e', '#4e517e'],
+                    valueRange: [0, 270]
+                });
+
+            });
+        }
+        loadData();
+    </script>
+
+{% endblock %}
